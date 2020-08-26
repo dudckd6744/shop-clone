@@ -4,7 +4,7 @@ const multer = require('multer');
 const { Product } = require("../models/Product");
 
 const { auth } = require("../middleware/auth");
-const User = require('../models/User');
+const {User} = require('../models/User');
 
 //=================================
 //             Product
@@ -44,6 +44,7 @@ router.post('/products',(req,res)=>{
     var skip = req.body.skip ? parseInt(req.body.skip) :0;
     var limit = req.body.limit ? parseInt(req.body.limit): 100;
 
+    var term = req.body.search
     var findArgs = {};
 
     for(var key in req.body.filters){
@@ -60,7 +61,19 @@ router.post('/products',(req,res)=>{
 
         }
     }
-    console.log("find", findArgs)
+    // console.log("find", findArgs)
+
+    if(term){
+        Product.find(findArgs)
+        .find({ $text: {$search: term}})
+    .populate("writer")
+    .skip(skip)
+    .limit(limit)
+    .exec((err, product)=>{
+        if(err) return res.status(400).json({success:false, err})
+        return res.status(200).json({success:true, product, postSize:product.length})
+    })
+    }else{
     Product.find(findArgs)
     .populate("writer")
     .skip(skip)
@@ -69,7 +82,30 @@ router.post('/products',(req,res)=>{
         if(err) return res.status(400).json({success:false, err})
         return res.status(200).json({success:true, product, postSize:product.length})
     })
+}
 
 })
+
+
+router.post("/getProduct", (req, res) => {
+
+    var productIds = req.body.id
+    var type = req.body.type
+
+    if(type === "array"){
+        var ids = req.body.id.split(',')
+        productIds = ids.map(item=>{
+            return item
+        })
+    }
+
+
+    Product.find({_id : {$in:productIds}})
+    .populate("writer")
+    .exec((err, doc)=>{
+        if(err) return res.status(400).send(err)
+        res.status(200).send(doc)
+    })
+});
 
 module.exports = router;

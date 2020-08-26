@@ -30,6 +30,14 @@ const userSchema = mongoose.Schema({
     token : {
         type: String,
     },
+    cart :{
+        type:Array,
+        default:[]
+    },
+    history:{
+        type:Array,
+        default:[]
+    },
     tokenExp :{
         type: Number
     }

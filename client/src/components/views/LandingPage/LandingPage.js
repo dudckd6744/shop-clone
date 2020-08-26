@@ -6,6 +6,7 @@ import Meta from 'antd/lib/card/Meta';
 import ImageSlider from "../../util/ImageSlider";
 import CheckBox from "./Section/CheckBox";
 import RadioBox from "./Section/RadioBox";
+import Searches from "./Section/Searches";
 
 function LandingPage() {
 
@@ -13,6 +14,7 @@ function LandingPage() {
     const [Skip, setSkip] = useState(0)
     const [Limit, setLimit] = useState(8)
     const [PostSize, setPostSize] = useState(0)
+    const [SearchTerm, setSearchTerm] = useState("")
     const [Filters, setFilters] = useState({
         continents: [],
         pirce: []
@@ -112,6 +114,20 @@ function LandingPage() {
 
     }
 
+    const updateSeach=(newSearch)=>{
+        var body ={
+            skip:0,
+            limit:Limit,
+            filters:Filters,
+            search:newSearch
+        }
+        setSkip(0)
+        setSearchTerm(newSearch)
+        getProducts(body)
+        console.log(newSearch)
+
+    }
+
     return (
         <div style={{ width:"75%", margin:"3rem auto"}}>
             <div style={{ textAlign:"center"}}>
@@ -132,6 +148,12 @@ function LandingPage() {
             </Row>
 
              {/* Search */}
+            <div style={{display:"flex", justifyContent:"flex-end", margin:"1rem auto"}}>
+                <Searches 
+                refreshFunction={updateSeach}
+                />
+            </div>
+            
             
 
             {/* Cards */}
